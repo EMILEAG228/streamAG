@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChaineTv - Accéder au Live</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #FFFFFF;
+    position: relative;
+    min-height: 100vh;
+    background-color: #000000;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Background collage CR7, Messi, Yamal */
+  .bg-collage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 0;
+  }
+
+  .bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(8px) grayscale(0.2);
+    opacity: 0.6;
+  }
+
+  /* Overlay sombre 70% pour lisibilité */
+  .bg-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1;
+  }
+
+  /* Header avec logo en haut à gauche */
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 16px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+  }
+
+  .logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(135deg, #FF0000 0%, #000000 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-fallback {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #FF0000 0%, #000000 100%);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.1;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Conteneur principal centré */
+  .main-container {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+  }
+
+  /* Bouton central glassmorphism */
+  .btn-live {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #FF0000 0%, #1a1a1a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #FFFFFF;
+    text-decoration: none;
+    cursor: pointer;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px rgba(255, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+                0 2px 0 rgba(255, 255, 255, 0.1) inset;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Hover desktop */
+  @media (hover: hover) {
+    .btn-live:hover {
+      transform: scale(1.03);
+      box-shadow: 0 12px 40px rgba(255, 0, 0, 0.45),
+                  0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+                  0 2px 0 rgba(255, 255, 255, 0.15) inset;
+    }
+  }
+
+  /* Active mobile */
+  .btn-live:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 16px rgba(255, 0, 0, 0.25),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  }
+
+  /* Footer en bas centré */
+  .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    text-align: center;
+    z-index: 10;
+  }
+
+  .footer-text {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.4;
+    font-weight: 400;
+  }
+
+  /* Responsive pour petits écrans < 390px */
+  @media (max-width: 390px) {
+    .btn-live {
+      width: 180px;
+      font-size: 16px;
+      padding: 18px 20px;
+    }
+
+    .header {
+      padding: 16px 12px;
+    }
+
+    .logo, .logo-fallback {
+      width: 50px;
+      height: 50px;
+    }
+
+    .logo-fallback {
+      font-size: 10px;
+    }
+  }
+
+  /* Support iOS safe area */
+  @supports (padding: max(0px)) {
+    .header {
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+    }
+    
+    .footer {
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+  }
+</style>
+</head>
+<body>
+  <!-- Background collage avec images libre de droit -->
+  <div class="bg-collage">
+    <img class="bg-image" src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80" alt="">
+    <img class="bg-image" src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800&q=80" alt="">
+    <img class="bg-image" src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&q=80" alt="">
+    <img class="bg-image" src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&q=80" alt="">
+    <img class="bg-image" src="https://images.unsplash.com/photo-1517927033932-b3d18e61b530?w=800&q=80" alt="">
+    <img class="bg-image" src="https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=800&q=80" alt="">
+  </div>
+  <div class="bg-overlay"></div>
+
+  <!-- Header avec logo -->
+  <header class="header">
+    <img 
+      src="https://amibagroue.wordpress.com/wp-content/uploads/2024/12/img_0227-1.jpg" 
+      alt="ChaineTv Logo" 
+      class="logo"
+      id="logoImg"
+      onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
+    <div class="logo-fallback" id="logoFallback">
+      Chaine<br>Tv
+    </div>
+  </header>
+
+  <!-- Conteneur principal avec bouton centré -->
+  <main class="main-container">
+    <a href="https://vavoo.to/" 
+        
+       rel="noopener noreferrer" 
+       class="btn-live">
+      Accéder au Live
+    </a>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="footer-text">ChaineTv by emileag / emileagbabli7@gmail.com</p>
+  </footer>
+
+  <script>
+    // Feedback haptique léger sur mobile au clic si disponible
+    document.querySelector('.btn-live').addEventListener('touchstart', function() {
+      if (window.navigator && window.navigator.vibrate) {
+        navigator.vibrate(10);
+      }
+    });
+  </script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
+</body>
+</html>
