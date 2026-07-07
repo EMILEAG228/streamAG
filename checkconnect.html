@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChaineTv - Status</title>
+<style>
+  body {
+    margin: 0;
+    background: #0A0A0F;
+    color: white;
+    font-family: system-ui;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  .status {
+    padding: 20px 40px;
+    border-radius: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    border: 2px solid;
+  }
+  .online { 
+    background: rgba(0,255,156,0.1); 
+    border-color: #00FF9C; 
+    color: #00FF9C;
+    box-shadow: 0 0 30px rgba(0,255,156,0.3);
+  }
+  .offline { 
+    background: rgba(255,61,90,0.1); 
+    border-color: #FF3D5A; 
+    color: #FF3D5A;
+    box-shadow: 0 0 30px rgba(255,61,90,0.3);
+  }
+</style>
+</head>
+<body>
+  <div id="status" class="status offline">Vérification...</div>
+
+<script>
+// VRAI test de connexion internet
+async function checkInternet() {
+  const statusEl = document.getElementById('status');
+  
+  try {
+    // On ping un petit fichier Google qui répond toujours
+    const response = await fetch('https://www.google.com/favicon.ico', {
+      method: 'HEAD',
+      mode: 'no-cors',
+      cache: 'no-store'
+    });
+    
+    statusEl.textContent = '🟢 CONNECTÉ';
+    statusEl.className = 'status online';
+  } catch (error) {
+    statusEl.textContent = '🔴 DÉCONNECTÉ';
+    statusEl.className = 'status offline';
+  }
+}
+
+// Test au chargement
+checkInternet();
+
+// Re-test toutes les 5 secondes
+setInterval(checkInternet, 5000);
+
+// Re-test si le réseau change
+window.addEventListener('online', checkInternet);
+window.addEventListener('offline', checkInternet);
+</script>
+</body>
+</html>
